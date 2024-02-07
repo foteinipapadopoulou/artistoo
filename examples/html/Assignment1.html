@@ -123,8 +123,8 @@ function initializeGrid(){
 	this.gm.seedCellsInCircle( 1, 5, this.C.midpoint, this.C.extents[0]/3 );
 	// this.gm.seedCellsInCircle( 2, 5, this.C.midpoint, this.C.extents[0]/3 );
 
-  for (let i = 25; i < 200; i += 25) {
-    for (let j = 25; j < 200; j += 25) {
+  for (let i = 25; i <= 200; i += 25) {
+    for (let j = 25; j <= 200; j += 25) {
       let currentposition = [i, j];
       let circ = this.gm.makeCircle(currentposition, 5)
       this.gm.assignCellPixels(circ, 2)
@@ -188,17 +188,33 @@ function killAllCells(){
 }
 
 function add_grid_obstacle() {
-  for (let i = 25; i < 200; i += 25) {
-    for (let j = 25; j < 200; j += 25) {
+  for (let i = 25; i <= 200; i += 25) {
+    for (let j = 25; j <= 200; j += 25) {
       let currentposition = [i, j];
       let circ = sim.gm.makeCircle(currentposition, 5)
       sim.gm.assignCellPixels(circ, 2)
     }
   }
-}
+	}
 
-	function add_center_grid() {
+	function add_grid_4x4() {
+    for (let i = 40; i <= 200; i += 40) {
+      for (let j = 40; j <= 200; j += 40) {
+        let currentposition = [i, j];
+        let circ = sim.gm.makeCircle(currentposition, 5)
+        sim.gm.assignCellPixels(circ, 2)
+      }
+    }
+	}
 
+	function add_grid_2x2() {
+    for (let i = 66; i <= 200; i += 66) {
+      for (let j = 66; j <= 200; j += 66) {
+        let currentposition = [i, j];
+        let circ = sim.gm.makeCircle(currentposition, 5)
+        sim.gm.assignCellPixels(circ, 2)
+      }
+    }
 	}
 
 
@@ -216,6 +232,8 @@ function add_grid_obstacle() {
 <button onclick="killCell()">remove cell</button>
 <button onclick="killAllCells()">remove all cells</button>
 <button onclick="add_grid_obstacle()">add obstacle grid</button>
+<button onclick="add_grid_4x4()">add 4x4 grid</button>
+<button onclick="add_grid_2x2()">add 2x2 grid</button>
 <br>
 <div class="slidecontainer">
 <form autocomplete="off">
