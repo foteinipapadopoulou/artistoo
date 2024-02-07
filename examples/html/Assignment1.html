@@ -30,7 +30,7 @@ let config = {
 
 	// Grid settings
 	ndim : 2,
-	field_size : [250,250],
+	field_size : [200,200],
 	
 	// CPM parameters and configuration
 	conf : {
@@ -46,19 +46,19 @@ let config = {
 
 		
 		// Adhesion parameters:
-		J : [ [NaN, 20, 20], [0, 20, 20], [10, 10, 10] ],
+		J : [ [NaN, 20, 20], [20, 0, 0], [NaN, 20, 20] ],
 		
 		// VolumeConstraint parameters
-		LAMBDA_V : [0,50, 500],				// VolumeConstraint importance per cellkind
-		V : [0,228, 114],					// Target volume of each cellkind
+		LAMBDA_V : [0, 50, 500],				// VolumeConstraint importance per cellkind
+		V : [0,200, 100],					// Target volume of each cellkind
 		
 		// PerimeterConstraint parameters
 		LAMBDA_P : [0, 2, 200],				// PerimeterConstraint importance per cellkind
-		P : [0,170, 34],					// Target perimeter of each cellkind
+		P : [0,180, 34],					// Target perimeter of each cellkind
 		
 		// ActivityConstraint parameters
-		LAMBDA_ACT : [0, 140, 140],			// ActivityConstraint importance per cellkind
-		MAX_ACT : [0,60, 20],				// Activity memory duration per cellkind
+		LAMBDA_ACT : [0, 200, 140],			// ActivityConstraint importance per cellkind
+		MAX_ACT : [0,20, 20],				// Activity memory duration per cellkind
 		ACT_MEAN : "geometric"				// Is neighborhood activity computed as a
 		// "geometric" or "arithmetic" mean?
 	},
@@ -85,7 +85,7 @@ let config = {
 		// Output images
 		SAVEIMG : true,						// Should a png image of the grid be saved
 		// during the simulation?
-		IMGFRAMERATE : 1,					// If so, do this every <IMGFRAMERATE> MCS.
+		IMGFRAMERATE : 5,					// If so, do this every <IMGFRAMERATE> MCS.
 		SAVEPATH : "output/img/CollectiveMigration",	// ... And save the image in this folder.
 		EXPNAME : "CollectiveMigration",					// Used for the filename of output images.
 		
@@ -122,14 +122,14 @@ function initializeGrid(){
 	
 	this.gm.seedCellsInCircle( 1, 5, this.C.midpoint, this.C.extents[0]/3 );
 	// this.gm.seedCellsInCircle( 2, 5, this.C.midpoint, this.C.extents[0]/3 );
-	
-	  for (let i = 25; i < 250; i+=25){
-			for (let j = 25; j < 250; j += 25) {
-        let currentposition = [i, j];
-				let circ = this.gm.makeCircle(currentposition, 6)
-				this.gm.assignCellPixels(circ, 2)
-		}
-	}
+
+  for (let i = 25; i < 200; i += 25) {
+    for (let j = 25; j < 200; j += 25) {
+      let currentposition = [i, j];
+      let circ = this.gm.makeCircle(currentposition, 5)
+      this.gm.assignCellPixels(circ, 2)
+    }
+  }
 	
 	
 }
@@ -181,9 +181,26 @@ function killAllCells(){
 	let cells = Object.keys( sim.C.getStat( CPM.PixelsByCell ) )
 	if( cells.length == 0 ) return
 	for( let cp of sim.C.cellPixels() ){
-		sim.C.setpix( cp[0], 0 )
+		sim.C.setpix(cp[0], 0)
+	let i = 25
+	let j = 25
 	}
 }
+
+function add_grid_obstacle() {
+  for (let i = 25; i < 200; i += 25) {
+    for (let j = 25; j < 200; j += 25) {
+      let currentposition = [i, j];
+      let circ = sim.gm.makeCircle(currentposition, 5)
+      sim.gm.assignCellPixels(circ, 2)
+    }
+  }
+}
+
+	function add_center_grid() {
+
+	}
+
 
 </script>
 </head>
@@ -198,6 +215,7 @@ function killAllCells(){
 <button onclick="seedCells(100)">+100 cells</button>
 <button onclick="killCell()">remove cell</button>
 <button onclick="killAllCells()">remove all cells</button>
+<button onclick="add_grid_obstacle()">add obstacle grid</button>
 <br>
 <div class="slidecontainer">
 <form autocomplete="off">
