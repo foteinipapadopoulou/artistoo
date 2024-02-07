@@ -50,15 +50,15 @@ let config = {
 		
 		// VolumeConstraint parameters
 		LAMBDA_V : [0,50, 500],				// VolumeConstraint importance per cellkind
-		V : [0,500, 114],					// Target volume of each cellkind
+		V : [0,228, 114],					// Target volume of each cellkind
 		
 		// PerimeterConstraint parameters
-		LAMBDA_P : [0,2, 2],				// PerimeterConstraint importance per cellkind
-		P : [0,340, 34],					// Target perimeter of each cellkind
+		LAMBDA_P : [0, 2, 200],				// PerimeterConstraint importance per cellkind
+		P : [0,170, 34],					// Target perimeter of each cellkind
 		
 		// ActivityConstraint parameters
-		LAMBDA_ACT : [0,140, 140],			// ActivityConstraint importance per cellkind
-		MAX_ACT : [0,40, 20],				// Activity memory duration per cellkind
+		LAMBDA_ACT : [0, 140, 140],			// ActivityConstraint importance per cellkind
+		MAX_ACT : [0,60, 20],				// Activity memory duration per cellkind
 		ACT_MEAN : "geometric"				// Is neighborhood activity computed as a
 		// "geometric" or "arithmetic" mean?
 	},
