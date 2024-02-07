@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>CollectiveMigration</title>
+<title>Assignment 1</title>
 <style type="text/css">
 body{
 		font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue",
@@ -46,11 +46,11 @@ let config = {
 
 		
 		// Adhesion parameters:
-		J : [ [NaN, 0, 20], [20,0, 0], [20, 0, 0] ],
+		J : [ [NaN, 20, 20], [0, 20, 20], [10, 10, 10] ],
 		
 		// VolumeConstraint parameters
-		LAMBDA_V : [0,50, 50],				// VolumeConstraint importance per cellkind
-		V : [0,500, 500],					// Target volume of each cellkind
+		LAMBDA_V : [0,50, 500],				// VolumeConstraint importance per cellkind
+		V : [0,500, 114],					// Target volume of each cellkind
 		
 		// PerimeterConstraint parameters
 		LAMBDA_P : [0,2, 2],				// PerimeterConstraint importance per cellkind
@@ -58,7 +58,7 @@ let config = {
 		
 		// ActivityConstraint parameters
 		LAMBDA_ACT : [0,140, 140],			// ActivityConstraint importance per cellkind
-		MAX_ACT : [0,20, 20],				// Activity memory duration per cellkind
+		MAX_ACT : [0,40, 20],				// Activity memory duration per cellkind
 		ACT_MEAN : "geometric"				// Is neighborhood activity computed as a
 		// "geometric" or "arithmetic" mean?
 	},
@@ -123,10 +123,11 @@ function initializeGrid(){
 	this.gm.seedCellsInCircle( 1, 5, this.C.midpoint, this.C.extents[0]/3 );
 	// this.gm.seedCellsInCircle( 2, 5, this.C.midpoint, this.C.extents[0]/3 );
 	
-	  for (let i = 50; i < 250; i+=50){
-		for (let j = 50; j < 250; j+=50) {
-			let currentposition = [i, j];
-			this.gm.seedCellAt( 2, currentposition);
+	  for (let i = 25; i < 250; i+=25){
+			for (let j = 25; j < 250; j += 25) {
+        let currentposition = [i, j];
+				let circ = this.gm.makeCircle(currentposition, 6)
+				this.gm.assignCellPixels(circ, 2)
 		}
 	}
 	
@@ -188,7 +189,7 @@ function killAllCells(){
 </head>
 <body onload="initialize()">
   
-<h1> Collective Migration</h1>
+<h1>Assignment 1</h1>
 <br>
 <button onclick="startsim()">start</button>
 <button onclick="stopsim()">stop</button>
@@ -243,34 +244,34 @@ function killAllCells(){
 </tr>
 <tr>
 	<td>Adhesion2<sub>cell-matrix</sub></td><td>
-	<input type="text" value="20" id="jte" oninput="sim.C.conf.J[2][0]=sim.C.conf.J[0][2]=parseInt(this.value)">
+	<input type="text" value="20" id="jte2" oninput="sim.C.conf.J[2][0]=sim.C.conf.J[0][2]=parseInt(this.value)">
 	</td>
 	<td>Adhesion2<sub>cell-cell</sub></td><td>
-	<input type="text" value="0" id="jtt" oninput="sim.C.conf.J[2][2]=parseInt(this.value)">
+	<input type="text" value="0" id="jtt2" oninput="sim.C.conf.J[2][2]=parseInt(this.value)">
 	</td>
 </tr>
 <tr>
 	<td>Volume2</td><td>
-		<input type="text" value="500" id="volume" oninput="if(this.value>0){sim.C.conf.V[2]=this.value}">
+		<input type="text" value="500" id="volume2" oninput="if(this.value>0){sim.C.conf.V[2]=this.value}">
 	</td>
 	<td>&lambda;<sub>Volume2</sub></td><td>
-		<input type="text" value="50" id="lvolume" oninput="sim.C.conf.LAMBDA_V[2]=this.value">
+		<input type="text" value="50" id="lvolume2" oninput="sim.C.conf.LAMBDA_V[2]=this.value">
 	</td>
 </tr>
 <tr>
 	<td>Perimeter2</td><td>
-		<input type="text" value="34" id="perimeter" oninput="sim.C.conf.P[2]=this.value">
+		<input type="text" value="34" id="perimeter2" oninput="sim.C.conf.P[2]=this.value">
 	</td>
 	<td>&lambda;<sub>P2</sub></td><td>
-		<input type="text" value="2" id="lperim" oninput="sim.C.conf.LAMBDA_P[2]=this.value">
+		<input type="text" value="2" id="lperim2" oninput="sim.C.conf.LAMBDA_P[2]=this.value">
 	</td>
 </tr>
 <tr>
 	<td>Max<sub>Act2</sub></td><td>
-		<input type="text" value="20" id="mact" oninput="sim.C.conf.MAX_ACT[1]=this.value">
+		<input type="text" value="20" id="mact2" oninput="sim.C.conf.MAX_ACT[1]=this.value">
 	</td>
 	<td>&lambda;<sub>Act2</sub></td><td>
-		<input type="text" value="140" id="lact" oninput="sim.C.conf.LAMBDA_ACT[1]=this.value">
+		<input type="text" value="140" id="lact2" oninput="sim.C.conf.LAMBDA_ACT[1]=this.value">
 	</td>
 </tr>
 
