@@ -37,7 +37,7 @@ let config = {
 		// Basic CPM parameters
 		torus : [true,true],						// Should the grid have linked borders?
 		seed : 1,							// Seed for random number generation.
-		T : 15,								// CPM temperature
+		T : 20,								// CPM temperature
 		
 		// Constraint parameters. 
 		// Mostly these have the format of an array in which each element specifies the
@@ -185,7 +185,17 @@ function killAllCells(){
 	let i = 25
 	let j = 25
 	}
-}
+	}
+
+	function add_grid_tight() {
+    for (let i = 20; i <= 200; i += 20) {
+      for (let j = 20; j <= 200; j += 20) {
+        let currentposition = [i, j];
+        let circ = sim.gm.makeCircle(currentposition, 5)
+        sim.gm.assignCellPixels(circ, 2)
+      }
+    }
+	}
 
 function add_grid_obstacle() {
   for (let i = 25; i <= 200; i += 25) {
@@ -217,10 +227,30 @@ function add_grid_obstacle() {
     }
 	}
 
+	function change_to_default() {
+		document.getElementById("jte").value = sim.C.conf.J[1][0];
+    document.getElementById("jtt").value = sim.C.conf.J[1][1];
+    document.getElementById("volume").value = sim.C.conf.V[1];
+    document.getElementById("lvolume").value = sim.C.conf.LAMBDA_V[1];
+    document.getElementById("perimeter").value = sim.C.conf.P[1];
+    document.getElementById("lperim").value = sim.C.conf.LAMBDA_P[1];
+    document.getElementById("mact").value = sim.C.conf.MAX_ACT[1];
+    document.getElementById("lact").value = sim.C.conf.LAMBDA_ACT[1];
+    document.getElementById("t").value = sim.C.conf.T;
+    document.getElementById("frames").value = sim.conf['IMGFRAMERATE'];
+    document.getElementById("jte2").value = sim.C.conf.J[2][0];
+    document.getElementById("jtt2").value = sim.C.conf.J[2][2];
+    document.getElementById("volume2").value = sim.C.conf.V[2];
+    document.getElementById("lvolume2").value = sim.C.conf.LAMBDA_V[2];
+    document.getElementById("perimeter2").value = sim.C.conf.P[2];
+    document.getElementById("lperim2").value = sim.C.conf.LAMBDA_P[2];
+    document.getElementById("mact2").value = sim.C.conf.MAX_ACT[2];
+    document.getElementById("lact2").value = sim.C.conf.LAMBDA_ACT[2];
+	}
 
 </script>
 </head>
-<body onload="initialize()">
+<body onload="initialize(); change_to_default()">
   
 <h1>Assignment 1</h1>
 <br>
@@ -231,9 +261,11 @@ function add_grid_obstacle() {
 <button onclick="seedCells(100)">+100 cells</button>
 <button onclick="killCell()">remove cell</button>
 <button onclick="killAllCells()">remove all cells</button>
+<button onclick="add_grid_tight()">add tight grid</button>
 <button onclick="add_grid_obstacle()">add obstacle grid</button>
 <button onclick="add_grid_4x4()">add 4x4 grid</button>
 <button onclick="add_grid_2x2()">add 2x2 grid</button>
+<button onclick="change_to_default()">Change table values</button>
 <br>
 <div class="slidecontainer">
 <form autocomplete="off">
@@ -304,10 +336,10 @@ function add_grid_obstacle() {
 </tr>
 <tr>
 	<td>Max<sub>Act2</sub></td><td>
-		<input type="text" value="20" id="mact2" oninput="sim.C.conf.MAX_ACT[1]=this.value">
+		<input type="text" value="20" id="mact2" oninput="sim.C.conf.MAX_ACT[2]=this.value">
 	</td>
 	<td>&lambda;<sub>Act2</sub></td><td>
-		<input type="text" value="140" id="lact2" oninput="sim.C.conf.LAMBDA_ACT[1]=this.value">
+		<input type="text" value="140" id="lact2" oninput="sim.C.conf.LAMBDA_ACT[2]=this.value">
 	</td>
 </tr>
 
