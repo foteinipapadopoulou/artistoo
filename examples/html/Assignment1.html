@@ -77,7 +77,8 @@ let config = {
 		
 		// Visualization
 		CANVASCOLOR : "eaecef",
-		CELLCOLOR : ["000000", "FF0000"],
+		CELLCOLOR: ["000000", "FF0000"],
+		DIRCOLOR: ["000000", "0000FF"],
 		ACTCOLOR : [true, true],			// Should pixel activity values be displayed?
 		SHOWBORDERS : [false, true],				// Should cellborders be displayed?
 		zoom : 2,							// zoom in on canvas with this factor.
@@ -102,11 +103,10 @@ let sim, meter
 function initialize(){
 
 	let custommethods = {
-		initializeGrid : initializeGrid
+		initializeGrid: initializeGrid,
+		drawCanvas: drawCanvas
 	}
 	sim = new CPM.Simulation( config, custommethods )
-
-
 
 	meter = new FPSMeter({left:"auto", right:"5px"})
 	step()
@@ -143,6 +143,74 @@ function step(){
 	}
 }
 
+  // Custom drawing function to draw the preferred directions.
+	function drawCanvas() {
+
+		/* This part is the normal drawing function */
+
+		// Add the canvas if required
+		if (!this.helpClasses["canvas"]) { this.addCanvas() }
+
+		// Clear canvas and draw stroma border
+		this.Cim.clear(this.conf["CANVASCOLOR"])
+
+		// Draw each cellkind appropriately
+		let cellcolor = this.conf["CELLCOLOR"],
+			actcolor = this.conf["ACTCOLOR"],
+			nrcells = this.conf["NRCELLS"], cellkind, cellborders = this.conf["SHOWBORDERS"]
+		for (cellkind = 0; cellkind < nrcells.length; cellkind++) {
+
+			// draw the cells of each kind in the right color
+			if (cellcolor[cellkind] != -1) {
+				this.Cim.drawCells(cellkind + 1, cellcolor[cellkind])
+			}
+
+			// Draw borders if required
+			if (cellborders[cellkind]) {
+				this.Cim.drawCellBorders(cellkind + 1, "000000")
+			}
+
+			if (actcolor[cellkind]) {
+				this.Cim.drawActivityValues(cellkind + 1, this.constraints["ActivityConstraint"])
+			}
+		}
+		if (document.getElementById("velo_button").textContent == "Hide velocity") {
+			let ctx = this.Cim.context(), zoom = this.conf["zoom"]
+		ctx.beginPath()
+		ctx.linewidth = 2 * zoom
+
+		let cellIndices = this.C.getStat(CPM.PixelsByCell)
+		for(let [cellID, indices] of Object.entries(cellIndices)) {
+			let centroidTorusList = this.C.getStat(CPM.CentroidsWithTorusCorrection)
+			let x = 0
+			let y = 0
+			let n = 0
+			let cellKind = this.C.cellKind(cellID)
+			for (let j of indices) {
+				let j_activ = this.C.soft_constraints["3"].activityAt(this.C.grid.p2i(j))
+				if (j_activ > ((this.C.conf.MAX_ACT[cellKind] * (11 / 12)) - (40 / 3))) {
+					x += j[0]
+					y += j[1]
+					n += 1
+				}
+			}
+			let pos = [x / n, y / n]
+
+			let center = centroidTorusList[cellID]
+			let dx = pos[0] - center[0]
+			let dy = pos[1] - center[1]
+			let magnitude = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
+			let ux = dx / magnitude
+			let uy = dy / magnitude
+			let new_pos = [center[0] + 10 * ux, center[1] + 10 * uy]
+
+			ctx.moveTo(center[0] * zoom, center[1] * zoom)
+			ctx.lineTo(new_pos[0] * zoom, new_pos[1] * zoom)
+			ctx.strokeStyle = "#7777FF"
+			ctx.stroke()
+		}
+		}
+	}
 
 
 /* The following custom methods are used for control buttons on the html page.*/
@@ -188,8 +256,9 @@ function killAllCells(){
 	}
 
 	function add_grid_tight() {
-    for (let i = 20; i <= 200; i += 20) {
-      for (let j = 20; j <= 200; j += 20) {
+		let size = sim.C.grid.extents
+    for (let i = 20; i <= size[0]; i += 20) {
+      for (let j = 20; j <= size[1]; j += 20) {
         let currentposition = [i, j];
         let circ = sim.gm.makeCircle(currentposition, 5)
         sim.gm.assignCellPixels(circ, 2)
@@ -248,6 +317,27 @@ function add_grid_obstacle() {
     document.getElementById("lact2").value = sim.C.conf.LAMBDA_ACT[2];
 	}
 
+	function change_visibility() {
+		let vis = document.getElementsByClassName("slidecontainer")[0]
+		let tex = document.getElementById("vis_button")
+		if (vis.style.display == "") {
+			vis.style.display = "none"
+			tex.textContent = "Show controls"
+		} else {
+			vis.style.display = ""
+			tex.textContent = "Hide controls"
+		}
+	}
+
+	function toggle_velocity() {
+		let text = document.getElementById("velo_button")
+		if (text.textContent == "Show velocity") {
+			text.textContent = "Hide velocity"
+		} else {
+			text.textContent = "Show velocity"
+		}
+	}
+
 </script>
 </head>
 <body onload="initialize(); change_to_default()">
@@ -266,6 +356,8 @@ function add_grid_obstacle() {
 <button onclick="add_grid_4x4()">add 4x4 grid</button>
 <button onclick="add_grid_2x2()">add 2x2 grid</button>
 <button onclick="change_to_default()">Change table values</button>
+<button id="vis_button" onclick="change_visibility()">Hide controls</button>
+<button id="velo_button" onclick="toggle_velocity()">Show velocity</button>
 <br>
 <div class="slidecontainer">
 <form autocomplete="off">
@@ -346,5 +438,6 @@ function add_grid_obstacle() {
 </table>
 </form>
 </div>
+<br>
 </body>
 </html>
