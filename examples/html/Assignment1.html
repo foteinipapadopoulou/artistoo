@@ -119,18 +119,6 @@ function initializeGrid(){
 	
 	// add the GridManipulator if not already there and if you need it
 	if( !this.helpClasses["gm"] ){ this.addGridManipulator() }
-	
-	this.gm.seedCellsInCircle( 1, 5, this.C.midpoint, this.C.extents[0]/3 );
-	// this.gm.seedCellsInCircle( 2, 5, this.C.midpoint, this.C.extents[0]/3 );
-
-  for (let i = 25; i <= 200; i += 25) {
-    for (let j = 25; j <= 200; j += 25) {
-      let currentposition = [i, j];
-      let circ = this.gm.makeCircle(currentposition, 5)
-      this.gm.assignCellPixels(circ, 2)
-    }
-  }
-
 
 }
 
@@ -143,6 +131,7 @@ function step(){
 	}
 }
 
+let old_centroids
   // Custom drawing function to draw the preferred directions.
 function drawCanvas() {
 
@@ -174,19 +163,23 @@ function drawCanvas() {
 		}
 	}
 	if (document.getElementById("velo_button").textContent == "Hide velocity") {
-		let ctx = this.Cim.context(), zoom = this.conf["zoom"]
-		ctx.beginPath()
-		ctx.linewidth = 2 * zoom
-
+		let ctx = this.Cim.context(), zoom = this.conf["zoom"]		
 		let cellIndices = this.C.getStat(CPM.PixelsByCell)
 		let vectors = []
+		let cen_vectors = []
+		let centroidTorusList = this.C.getStat(CPM.CentroidsWithTorusCorrection)
 		for(let [cellID, indices] of Object.entries(cellIndices)) {
-			let centroidTorusList = this.C.getStat(CPM.CentroidsWithTorusCorrection)
+			
 			let x = 0
 			let y = 0
 			let n = 0
 			let cellKind = this.C.cellKind(cellID)
 			if (cellKind == 2) {continue}
+
+
+
+
+
 			for (let j of indices) {
 				let j_activ = this.C.soft_constraints["3"].activityAt(this.C.grid.p2i(j))
 				if (j_activ > ((this.C.conf.MAX_ACT[cellKind] * (11 / 12)) - (40 / 3))) {
@@ -200,22 +193,46 @@ function drawCanvas() {
 			let center = centroidTorusList[cellID]
 			let dx = pos[0] - center[0]
 			let dy = pos[1] - center[1]
+			if (dx < -20 || dx > 20 || dy < -20 || dy > 20) {continue}
 			let magnitude = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2))
 			let ux = dx / magnitude
 			let uy = dy / magnitude
 			let new_pos = [center[0] + 10 * ux, center[1] + 10 * uy]
 
+			let old_center = old_centroids[cellID]
+			if (typeof old_center === 'undefined') {old_center = center}
+			let cen_dx = center[0] - old_center[0]
+			let cen_dy = center[1] - old_center[1]
+			let cen_magnitude = Math.sqrt(Math.pow(cen_dx, 2) + Math.pow(cen_dy, 2))
+			let cen_ux = cen_dx / cen_magnitude
+			let cen_uy = cen_dy / cen_magnitude
+			let new_cen_pos = [center[0] + 10 * cen_ux, center[1] + 10 * cen_uy]
+
       if (Number.isNaN(ux) || Number.isNaN(uy)) {
 				continue
 			} else {
 				vectors.push([ux, uy])
+				cen_vectors.push([cen_ux, cen_uy])
 			}
 
+			ctx.beginPath()
+			ctx.linewidth = 20 * zoom
+			ctx.strokeStyle = "rgb(255 0 255 / 200%)"
 			ctx.moveTo(center[0] * zoom, center[1] * zoom)
 			ctx.lineTo(new_pos[0] * zoom, new_pos[1] * zoom)
-			ctx.strokeStyle = "#7777FF"
-			ctx.stroke()
+			for (let i = 0; i < 10; i++) {ctx.stroke()}
+
+			ctx.beginPath()
+			ctx.linewidth = 20 * zoom
+			ctx.strokeStyle = "rgb(0 0 255 / 200%)"
+			ctx.moveTo(center[0] * zoom, center[1] * zoom)
+			ctx.lineTo(new_cen_pos[0] * zoom, new_cen_pos[1] * zoom)
+			for (let i = 0; i < 10; i++) {ctx.stroke()}
+
 		}
+
+		old_centroids = centroidTorusList
+
 		if (vectors.length >= 2) {
 			let dot = (a, b) => a.map((x, i) => a[i] * b[i]).reduce((m, n) => m + n);
 			let dot_sum = 0
@@ -229,9 +246,22 @@ function drawCanvas() {
 			}
 			let direction_cohesion = Math.round(dot_sum*10000 / dot_N)/100
       document.getElementById("dir_coh_anim").textContent = direction_cohesion
+
+			let cen_dot_sum = 0
+			let cen_dot_N = 0
+			for (let i = 0; i < cen_vectors.length - 1; i++) {
+				for (let j = i + 1; j < cen_vectors.length; j++) {
+					let cen_dot_ij = dot(cen_vectors[i], cen_vectors[j])
+					cen_dot_sum += cen_dot_ij
+					cen_dot_N += 1
+				}
+			}
+			let cen_direction_cohesion = Math.round(cen_dot_sum*10000 / cen_dot_N)/100
+      document.getElementById("cen_dir_coh_anim").textContent = cen_direction_cohesion
 		} else {
 			let direction_cohesion = -2
       document.getElementById("dir_coh_anim").textContent = direction_cohesion
+			document.getElementById("cen_dir_coh_anim").textContent = direction_cohesion
 		}
 		
 	}
@@ -311,6 +341,16 @@ function add_grid_obstacle() {
     }
 	}
 
+	function add_grid_3x3() {
+    for (let i = 50; i <= 200; i += 50) {
+      for (let j = 50; j <= 200; j += 50) {
+        let currentposition = [i, j];
+        let circ = sim.gm.makeCircle(currentposition, 5)
+        sim.gm.assignCellPixels(circ, 2)
+      }
+    }
+	}
+
 	function add_grid_2x2() {
     for (let i = 66; i <= 200; i += 66) {
       for (let j = 66; j <= 200; j += 66) {
@@ -363,15 +403,28 @@ function add_grid_obstacle() {
 		}
 	}
 
-	function add_canvas_click() {
-		let canvasDiv = document.getElementById("canvas-div")
-		let canvas = canvasDiv.childNodes[1];
-		canvas.onclick = function (e) {
-		let x = Math.round((e.clientX - canvas.offsetLeft) / 2);
-		let y = Math.round((e.clientY - canvas.offsetTop) / 2);
-		console.log(x, y);
-		sim.gm.seedCellAt(1, [x, y]);
+	function toggle_click_button() {
+		let text = document.getElementById("click_button")
+		if (text.textContent == "Click: True") {
+			text.textContent = "Click: False"
+		} else {
+			text.textContent = "Click: True"
+		}
 	}
+
+	function add_canvas_click() {
+		let canvas = document.querySelector('canvas');
+		canvas.onclick = function (e) {
+			if (document.getElementById("click_button").textContent == "Click: True") {
+				let x = Math.round((e.clientX - canvas.offsetLeft) / 2);
+				let y = Math.round((e.clientY - canvas.offsetTop) / 2);
+				console.log(x, y);
+				sim.gm.seedCellAt(1, [x, y]);
+			}
+	}
+
+
+}
 </script>
 </head>
 <body onload="initialize(); change_to_default(); add_canvas_click()">
@@ -388,11 +441,14 @@ function add_grid_obstacle() {
 <button onclick="add_grid_tight()">add tight grid</button>
 <button onclick="add_grid_obstacle()">add obstacle grid</button>
 <button onclick="add_grid_4x4()">add 4x4 grid</button>
+<button onclick="add_grid_3x3()">add 3x3 grid</button>
 <button onclick="add_grid_2x2()">add 2x2 grid</button>
 <button onclick="change_to_default()">Change table values</button>
 <button id="vis_button" onclick="change_visibility()">Hide controls</button>
 <button id="velo_button" onclick="toggle_velocity()">Show velocity</button>
+<button id="click_button" onclick="toggle_click_button()">Click: False</button>
 <div id="dir_coh_anim">0</div>
+<div id="cen_dir_coh_anim">0</div>
 <br>
 <div class="slidecontainer">
 <form autocomplete="off">
