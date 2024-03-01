@@ -46,7 +46,7 @@ let config = {
 
 		
 		// Adhesion parameters:
-		J : [ [NaN, 20, 20], [20, 0, 0], [NaN, 20, 20] ],
+		J : [ [NaN, 20, 20], [20, 0, 0], [NaN, 0, 0] ],
 		
 		// VolumeConstraint parameters
 		LAMBDA_V : [0, 50, 500],				// VolumeConstraint importance per cellkind
@@ -122,13 +122,15 @@ function initializeGrid(){
 
 }
 
-
 function step(){
 	sim.step()
 	meter.tick()
+
 	if( sim.conf["RUNTIME_BROWSER"] == "Inf" | sim.time+1 < sim.conf["RUNTIME_BROWSER"] ){
 		requestAnimationFrame( step )
 	}
+
+	document.getElementById("current_frame").textContent = sim.time
 }
 
 let old_centroids
@@ -136,7 +138,6 @@ let old_centroids
 function drawCanvas() {
 
 	/* This part is the normal drawing function */
-
 	// Add the canvas if required
 	if (!this.helpClasses["canvas"]) { this.addCanvas() }
 
@@ -199,8 +200,22 @@ function drawCanvas() {
 			let uy = dy / magnitude
 			let new_pos = [center[0] + 10 * ux, center[1] + 10 * uy]
 
-			let old_center = old_centroids[cellID]
-			if (typeof old_center === 'undefined') {old_center = center}
+			let old_center
+			if (typeof old_centroids === 'undefined') {
+				old_centroids = centroidTorusList
+				old_center = old_centroids[cellID]
+			} else {
+				old_center = old_centroids[cellID]
+			}
+			if (typeof old_center === 'undefined') {
+				old_center = center
+			} else if (typeof old_center[0] === 'undefined'){
+				old_centroids = centroidTorusList
+				old_center = old_centroids[cellID]
+			}else {
+				old_center = old_centroids[cellID]
+			}
+
 			let cen_dx = center[0] - old_center[0]
 			let cen_dy = center[1] - old_center[1]
 			let cen_magnitude = Math.sqrt(Math.pow(cen_dx, 2) + Math.pow(cen_dy, 2))
@@ -449,6 +464,7 @@ function add_grid_obstacle() {
 <button id="click_button" onclick="toggle_click_button()">Click: False</button>
 <div id="dir_coh_anim">0</div>
 <div id="cen_dir_coh_anim">0</div>
+<div id="current_frame">0</div>
 <br>
 <div class="slidecontainer">
 <form autocomplete="off">
