@@ -1,4 +1,8 @@
 # Artistoo (Artificial Tissue Toolbox)
+The Artistoo repository has been forked, and a new example `Assignment1.html` has been added to the examples>html directory to perform the simulations for the Assignments 1 and 4 of the Natural Computing master course of the Radboud University.
+
+Details about the Artistoo library itself follow below.
+---
 
 Artistoo (formerly called CPMjs) is a JavaScript library for building Cellular Potts Model (CPM) simulations that can be shared and explored in the web browser, without requiring installed software. Full documentation is available on [artistoo.net](https://artistoo.net).
 
