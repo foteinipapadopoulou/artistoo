@@ -1,5 +1,5 @@
 # Artistoo (Artificial Tissue Toolbox)
-The Artistoo repository has been forked, and a new example `Assignment1.html` has been added to the `examples > html` directory to perform the simulations for Assignments 1 and 4 of the Natural Computing master course of Radboud University.
+The Artistoo repository has been forked, and a new example `Assignment1.html` has been added to the `examples > html` directory to perform the simulations and the `ANOVA_tests.ipynb` has been created for Assignments 1 and 4 of the Natural Computing master course of Radboud University.
 
 Details about the Artistoo library itself follow below.
 
