@@ -141,7 +141,7 @@ function make_graph_values(sim_time) {
 		let dir_coh_anim = document.getElementById("dir_coh_anim").textContent
 		let cen_dir_coh_anim = document.getElementById("cen_dir_coh_anim").textContent
 
-		graph_values.push([dir_coh_anim, cen_dir_coh_anim])
+		graph_values.push([sim_time, dir_coh_anim, cen_dir_coh_anim])
 	} 
 	if (sim_time%20000 == 0) {
 
